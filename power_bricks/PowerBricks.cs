@@ -7,12 +7,12 @@ namespace power_bricks
     /// <summary>
     /// This is the main type for your game.
     /// </summary>
-    public class Game1 : Game
+    public class PowerBricks : Game
     {
         GraphicsDeviceManager graphics;
         SpriteBatch spriteBatch; 
 
-        public Game1()
+        public PowerBricks()
         {
             graphics = new GraphicsDeviceManager(this);
             Content.RootDirectory = "Content";
