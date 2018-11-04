@@ -12,6 +12,7 @@ namespace power_bricks
     {
         public abstract void LoadTextures(ContentManager content);
         public abstract void Draw(SpriteBatch spriteBatch);
-        public abstract void Update(double deltaTime, PowerBricks game);
+        public abstract void Update(int deltaTime, PowerBricks game);
+        public abstract void OnEnter();
     }
 }
