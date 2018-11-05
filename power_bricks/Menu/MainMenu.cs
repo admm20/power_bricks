@@ -23,6 +23,7 @@ namespace power_bricks.Menu
 
         GameObject logo = new GameObject();
 
+        private const float logo_show_time = 1000.0f;
         private float logo_opacity = 0.0f;
         private int logo_timer = 0;
         private bool logo_fading_away = false;
@@ -104,7 +105,6 @@ namespace power_bricks.Menu
             show_menu = false;
         }
 
-        private const float logo_show_time = 10.0f;
         private void UpdateLogoTimer(int deltaTime)
         {
             logo_timer += deltaTime;

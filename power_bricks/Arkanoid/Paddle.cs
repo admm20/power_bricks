@@ -28,10 +28,10 @@ namespace power_bricks.Arkanoid
 
         public void Move_to_x(int x)
         {
-            if (x > 1600 - position.Width)
-                position.X = 1600 - position.Width;
-            else if (x < 0)
-                position.X = 0;
+            if (x > 1600 - position.Width - 25)
+                position.X = 1600 - position.Width - 25;
+            else if (x < 25)
+                position.X = 25;
             else
             {
                 if (x < position.X)

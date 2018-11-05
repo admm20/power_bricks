@@ -151,8 +151,8 @@ namespace power_bricks
             // change update frequency
             base.TargetElapsedTime = TimeSpan.FromSeconds(1.0 / 240.0);
 
-            ShowMainMenu();
-            //ShowGameMode();
+            //ShowMainMenu();
+            ShowGameMode();
             
 
             base.Initialize();

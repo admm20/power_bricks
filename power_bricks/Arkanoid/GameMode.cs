@@ -19,9 +19,9 @@ namespace power_bricks.Arkanoid
 
         Paddle paddle = new Paddle(new Rectangle(500, 1100, 240, 40));
 
-        Wall frame_left = new Wall(new Rectangle(-200, 0, 200, WINDOW_HEIGHT));
+        Wall frame_left = new Wall(new Rectangle(-175, 0, 200, WINDOW_HEIGHT));
         Wall frame_up = new Wall(new Rectangle(-200, -200, WINDOW_WIDTH + 400, 200));
-        Wall frame_right = new Wall(new Rectangle(WINDOW_WIDTH, 0, 200, WINDOW_HEIGHT));
+        Wall frame_right = new Wall(new Rectangle(WINDOW_WIDTH - 25, 0, 200, WINDOW_HEIGHT));
         Wall frame_down = new Wall(new Rectangle(-200, WINDOW_HEIGHT, WINDOW_WIDTH + 400, 200));
 
         Ball ball = new Ball(new Rectangle(1000, 1000, 30, 30));
@@ -31,6 +31,24 @@ namespace power_bricks.Arkanoid
 
         GameObject background = new GameObject(new Rectangle(0, 0, 1600, 1200));
 
+        private void LoadMap(String filePath)
+        {
+            Console.WriteLine("LOADING LEVEL");
+            string[] lines = System.IO.File.ReadAllLines(filePath);
+            for (int row = 0; row < 19; row++)
+            {
+                for (int col = 0; col < 19; col++)
+                {
+                    if (lines[row][col].Equals('1'))
+                    {
+                        Brick brick = new Brick(new Rectangle(30 + col * 81, 60 + row * 40, 81, 40));
+                        brick.texture = brick_texture; // ????
+                        listOfBricks.Add(brick);
+                    }
+
+                }
+            }
+        }
 
         private void UpdateBallPosition(int delta)
         {
@@ -172,16 +190,17 @@ namespace power_bricks.Arkanoid
             game.MouseClicked += MouseClicked;
 
             // load map
-            for(int col = 0; col < 19; col++)
-            {
-                for(int row = 0; row < 19; row++)
-                {
-                    Brick brick = new Brick(new Rectangle(25 + col * 80, 60 + row * 40, 80, 40));
-                    brick.texture = brick_texture; // ????
-                    listOfBricks.Add(brick);
+            //for(int col = 0; col < 19; col++)
+            //{
+            //    for(int row = 0; row < 19; row++)
+            //    {
+            //        Brick brick = new Brick(new Rectangle(30 + col * 81, 60 + row * 40, 81, 40));
+            //        brick.texture = brick_texture; // ????
+            //        listOfBricks.Add(brick);
 
-                }
-            }
+            //    }
+            //}
+            LoadMap("map1.txt");
         }
 
         public override void Update(int deltaTime, PowerBricks game)
@@ -198,7 +217,7 @@ namespace power_bricks.Arkanoid
 
         private void MouseClicked(object o, MouseClickEventArgs e)
         {
-
+            
         }
 
         public GameMode(PowerBricks game)
