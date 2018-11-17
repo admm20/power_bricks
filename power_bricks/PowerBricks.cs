@@ -228,7 +228,7 @@ namespace power_bricks
 
             base.Update(gameTime);
         }
-        
+
         protected override void Draw(GameTime gameTime)
         {
             GraphicsDevice.Clear(Color.CornflowerBlue);
@@ -243,13 +243,29 @@ namespace power_bricks
 
             GraphicsDevice.SetRenderTarget(null);
 
-            Rectangle windowSize = new Rectangle(0, 0, GraphicsDevice.PresentationParameters.BackBufferWidth,
-                GraphicsDevice.PresentationParameters.BackBufferHeight);
+            // Obraz będzie wyświetlany na środku ekranu i będą zachowane proporcje niezaleznie od tego,
+            // jakie są wymiary okna.
+            PresentationParameters windowSize = GraphicsDevice.PresentationParameters;
+            Rectangle rendererPosition = new Rectangle(0, 0, windowSize.BackBufferWidth,
+                windowSize.BackBufferHeight);
 
-            GraphicsDevice.Clear(Color.CornflowerBlue);
+            
+            if(rendererPosition.Width > rendererPosition.Height * 4.0 / 3.0) // za szerokie
+            {
+                rendererPosition.Width = (int)(rendererPosition.Height * (4.0 / 3.0));
+                rendererPosition.X = (int)((windowSize.BackBufferWidth - rendererPosition.Width) / 2.0);
+            }
+            else
+            {
+                rendererPosition.Height = (int)(rendererPosition.Width * (3.0 / 4.0));
+                rendererPosition.Y = (int)((windowSize.BackBufferHeight - rendererPosition.Height) / 2.0);
+            }
+            
+
+            GraphicsDevice.Clear(Color.Black);
             spriteBatch.Begin();
-            spriteBatch.Draw(renderer, windowSize, Color.White);
-            spriteBatch.Draw(black_tile, windowSize, Color.White * transition_opacity);
+            spriteBatch.Draw(renderer, rendererPosition, Color.White);
+            spriteBatch.Draw(black_tile, rendererPosition, Color.White * transition_opacity);
             spriteBatch.End();
             base.Draw(gameTime);
         }
