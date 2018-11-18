@@ -7,8 +7,17 @@ using System.Threading.Tasks;
 
 namespace power_bricks.Arkanoid
 {
+    public enum BrickTypeEnum{
+        NORMAL,
+        HP_1,
+        HP_2,
+        UNBREAKABLE
+    }
+
     class Brick : Collision
     {
+        public BrickTypeEnum brickType;
+
         public Brick(Rectangle position)
         {
             base.position = position;

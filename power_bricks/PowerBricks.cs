@@ -28,6 +28,15 @@ namespace power_bricks
             this.y = y;
         }
     }
+
+    public class KeyboardClickEventArgs : EventArgs
+    {
+        public KeyboardState ks;
+        public KeyboardClickEventArgs(KeyboardState kbState)
+        {
+            ks = kbState;
+        }
+    }
     /// <summary>
     /// This is the main type for your game.
     /// </summary>
@@ -52,6 +61,7 @@ namespace power_bricks
 
         public event EventHandler<FadeEffectEventArgs> FadeFinished;
         public event EventHandler<MouseClickEventArgs> MouseClicked;
+        public event EventHandler<KeyboardClickEventArgs> KeyboardClicked;
 
         private float transition_opacity = 0.0f;
         private int transition_timer = 0;
@@ -59,6 +69,8 @@ namespace power_bricks
         private bool transition_timer_working = false;
 
         bool mouseClick = false;
+
+        public KeyboardState PreviousKbState;
 
         // used to keep cursor inside window
         [DllImport("user32.dll")]
@@ -128,6 +140,15 @@ namespace power_bricks
                 handler(this, e);
             }
         }
+
+        public void OnKeyboardClick(KeyboardClickEventArgs e)
+        {
+            EventHandler<KeyboardClickEventArgs> handler = KeyboardClicked;
+            if (handler != null)
+            {
+                handler(this, e);
+            }
+        }
         
 
         public PowerBricks()
@@ -148,11 +169,13 @@ namespace power_bricks
             menu = new MainMenu(this);
             gameMode = new GameMode(this);
 
-            // change update frequency
-            base.TargetElapsedTime = TimeSpan.FromSeconds(1.0 / 240.0);
+            PreviousKbState = Keyboard.GetState();
 
-            //ShowMainMenu();
-            ShowGameMode();
+            // change update frequency
+            base.TargetElapsedTime = TimeSpan.FromSeconds(1.0 / 60.0);
+
+            ShowMainMenu();
+           // ShowGameMode();
             
 
             base.Initialize();
@@ -211,6 +234,13 @@ namespace power_bricks
                 }
             }
 
+            KeyboardState kbState = Keyboard.GetState();
+            if (kbState.GetPressedKeys().Length > 0)
+            {
+                OnKeyboardClick(new KeyboardClickEventArgs(kbState));
+            }
+            PreviousKbState = kbState;
+
             MouseState mouseState = Mouse.GetState();
             mouse_x = (int)(mouseState.Position.X * ((float)GAME_WIDTH / GraphicsDevice.PresentationParameters.BackBufferWidth));
             mouse_y = (int)(mouseState.Position.Y * ((float)GAME_HEIGHT / GraphicsDevice.PresentationParameters.BackBufferHeight));
@@ -235,7 +265,7 @@ namespace power_bricks
 
             // TODO: Add your drawing code here
             GraphicsDevice.SetRenderTarget(renderer);
-            GraphicsDevice.Clear(Color.Violet);
+            GraphicsDevice.Clear(Color.Black);
 
             spriteBatch.Begin();
             currentState.Draw(spriteBatch);

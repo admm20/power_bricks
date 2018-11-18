@@ -15,11 +15,9 @@ namespace power_bricks.Menu
         PowerBricks game = null;
 
         GameObject background = new GameObject(new Rectangle(0, 0, 1600, 1200));
-
-        Rectangle option_position = new Rectangle(570, 370, 500, 310);
-        GameObject option_1 = new GameObject();
-        GameObject option_2 = new GameObject();
-        GameObject option_3 = new GameObject();
+        
+        GameObject buttonStart = new GameObject();
+        GameObject buttonExit = new GameObject();
 
         GameObject logo = new GameObject();
 
@@ -30,39 +28,33 @@ namespace power_bricks.Menu
 
         private bool show_menu = false;
 
-        private int hover = 1;
+        private int hover = 0;
 
         public override void Draw(SpriteBatch spriteBatch)
         {
             spriteBatch.Draw(background.texture, background.position, Color.White);
             spriteBatch.Draw(logo.texture, logo.position, Color.White * logo_opacity);
+
             if (show_menu)
             {
-                switch (hover)
-                {
-                    case 1:
-                        spriteBatch.Draw(option_1.texture, option_1.position, Color.White);
-                        break;
-                    case 2:
-                        spriteBatch.Draw(option_2.texture, option_2.position, Color.White);
-                        break;
-                    case 3:
-                        spriteBatch.Draw(option_3.texture, option_3.position, Color.White);
-                        break;
-                    default:
-                        break;
-                }
+                spriteBatch.Draw(buttonStart.texture, buttonStart.position, Color.White);
+                spriteBatch.Draw(buttonExit.texture, buttonExit.position, Color.White);
             }
         }
 
         public override void LoadTextures(ContentManager content)
         {
             background.texture = content.Load<Texture2D>("Texture/Menu/background_clear");
-            option_1.texture = content.Load<Texture2D>("Texture/Menu/option_1");
-            option_2.texture = content.Load<Texture2D>("Texture/Menu/option_2");
-            option_3.texture = content.Load<Texture2D>("Texture/Menu/option_3");
+
             logo.texture = content.Load<Texture2D>("Texture/Menu/logo");
 
+            buttonStart.additional_textures.Add(content.Load<Texture2D>("Texture/Menu/start-game"));
+            buttonStart.additional_textures.Add(content.Load<Texture2D>("Texture/Menu/start-game-selected"));
+            buttonStart.texture = buttonStart.additional_textures[0];
+
+            buttonExit.additional_textures.Add(content.Load<Texture2D>("Texture/Menu/exit"));
+            buttonExit.additional_textures.Add(content.Load<Texture2D>("Texture/Menu/exit-selected"));
+            buttonExit.texture = buttonExit.additional_textures[0];
         }
 
         public override void Update(int deltaTime, PowerBricks game)
@@ -71,7 +63,20 @@ namespace power_bricks.Menu
 
             if(show_menu)
             {
-
+                if (buttonStart.position.Contains(game.mouse_x, game.mouse_y))
+                {
+                    hover = 1;
+                    buttonStart.texture = buttonStart.additional_textures[1];
+                    buttonExit.texture = buttonExit.additional_textures[0];
+                }
+                else if (buttonExit.position.Contains(game.mouse_x, game.mouse_y))
+                {
+                    hover = 2;
+                    buttonStart.texture = buttonStart.additional_textures[0];
+                    buttonExit.texture = buttonExit.additional_textures[1];
+                }
+                else
+                    hover = 0;
             }
         }
 
@@ -89,7 +94,10 @@ namespace power_bricks.Menu
         {
             if (show_menu)
             {
-                game.FadeOutEffect();
+                if (hover == 1)
+                    game.FadeOutEffect();
+                else if (hover == 2)
+                    game.Exit();
             }
         }
 
@@ -135,9 +143,8 @@ namespace power_bricks.Menu
 
         public MainMenu(PowerBricks game)
         {
-            option_1.position = option_position;
-            option_2.position = option_position;
-            option_3.position = option_position;
+            buttonStart.position = new Rectangle(800 - 234, 400, 468, 45);
+            buttonExit.position = new Rectangle(800 - 234, 500, 468, 45);
 
             logo.position = new Rectangle((game.GAME_WIDTH - 567) / 2,
                 (game.GAME_HEIGHT - 283) / 2, 567, 283);

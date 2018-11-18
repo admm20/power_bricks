@@ -10,10 +10,10 @@ namespace power_bricks.Arkanoid
 {
     struct Velocity
     {
-        public double x_direction;
-        public double y_direction;
+        public float x_direction;
+        public float y_direction;
 
-        public void Set_velocity(double x, double y)
+        public void Set_velocity(float x, float y)
         {
             x_direction = x;
             y_direction = y;
@@ -26,13 +26,17 @@ namespace power_bricks.Arkanoid
 
         public bool isInPaddle = false;
 
+        public float X, Y;
+
         public Ball(Rectangle position)
         {
 
             base.position = position;
+            X = position.X;
+            Y = position.Y;
             type = GameObjectType.BALL;
 
-            speed.Set_velocity(0.7, -0.7);
+            speed.Set_velocity(0.5f, -0.5f);
 
         }
     }

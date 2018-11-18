@@ -14,7 +14,8 @@ namespace power_bricks.Global
         BRICK,
         WALL,
         PADDLE,
-        LOSE_AREA
+        LOSE_AREA,
+        BONUS
     }
 
     class GameObject
@@ -24,7 +25,7 @@ namespace power_bricks.Global
         // texture, that will be drawn on screen
         public Texture2D texture;
         
-        public List<Texture2D> additional_textures;
+        public List<Texture2D> additional_textures = new List<Texture2D>();
 
         public string id;
 
