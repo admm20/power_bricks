@@ -4,9 +4,11 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using Microsoft.Xna.Framework;
+using Microsoft.Xna.Framework.Audio;
 using Microsoft.Xna.Framework.Content;
 using Microsoft.Xna.Framework.Graphics;
 using Microsoft.Xna.Framework.Input;
+using Microsoft.Xna.Framework.Media;
 using power_bricks.Global;
 
 namespace power_bricks.Arkanoid
@@ -17,6 +19,7 @@ namespace power_bricks.Arkanoid
         public enum GameEventEnum
         {
             BRICK_DESTROYED,
+            BRICK_DECREASE_HP,
             UNBREAKABLE_BRICK_HIT,
             LIFE_LOST,
             GAME_OVER,
@@ -60,10 +63,29 @@ namespace power_bricks.Arkanoid
         Texture2D bonus_slow;
         Texture2D bonus_double_ball;
 
+        Texture2D game_over_clear;
+        Texture2D play_again;
+        Texture2D play_again_selected;
+        Texture2D back_to_menu;
+        Texture2D back_to_menu_selected;
+
+        SoundEffect gunfire;
+        SoundEffect lost_life;
+        SoundEffect unbreakable;
+        SoundEffect common_brick;
+        SoundEffect pick_bonus;
+        Song level_up;
+  
+        float volume = 0.5f;
+        float pitch = 0.0f;
+        float pan = 0.0f;
+
 
         Player player = new Player();
 
         GameObject background = new GameObject(new Rectangle(0, 0, 1600, 1200));
+
+        int option = 0;
 
         private string[] levels = { "Levels/map1.txt", "Levels/map2.txt", "Levels/map3.txt" };
 
@@ -80,6 +102,7 @@ namespace power_bricks.Arkanoid
             switch (ev)
             {
                 case GameEventEnum.BRICK_DESTROYED:
+                    common_brick.Play(volume, pitch, pan);
                     player.points += 10;
                     int brickCounter = 0;
                     foreach (Brick b in listOfBricks)
@@ -95,9 +118,14 @@ namespace power_bricks.Arkanoid
                     }
                     GenerateBonus();
                     break;
+                case GameEventEnum.BRICK_DECREASE_HP:
+                    common_brick.Play(volume, pitch, pan);
+                    break;
                 case GameEventEnum.UNBREAKABLE_BRICK_HIT:
+                    unbreakable.Play(volume, pitch, pan);
                     break;
                 case GameEventEnum.LIFE_LOST:
+                    lost_life.Play(volume, pitch, pan);
                     listOfBonus.Clear();
                     player.holdingBall = false;
                     player.lifes--;
@@ -117,18 +145,22 @@ namespace power_bricks.Arkanoid
                 case GameEventEnum.GAME_OVER:
                     Console.WriteLine("PRZEGRALES");
                     showScoreboard = true;
+                    game.ShowCursor();
                     break;
                 case GameEventEnum.BALL_HIT_PADDLE:
                     break;
                 case GameEventEnum.BALL_HIT_WALL:
                     break;
                 case GameEventEnum.BONUS_PICKED:
+                    pick_bonus.Play(volume - .4f, pitch, pan);
                     break;
                 case GameEventEnum.GAME_WIN:
                     Console.WriteLine("WYGRALES");
                     showScoreboard = true;
                     break;
                 case GameEventEnum.LEVEL_COMPLETED:
+                    MediaPlayer.Volume = .5f;
+                    MediaPlayer.Play(level_up);
                     Console.WriteLine("wygrales poziom");
                     player.level++;
                     if (player.level > 2)
@@ -140,6 +172,7 @@ namespace power_bricks.Arkanoid
                     game.FadeOutEffect();
                     break;
                 case GameEventEnum.SHOOT:
+                    gunfire.Play(volume, pitch, pan);
                     break;
             }
         }
@@ -268,6 +301,7 @@ namespace power_bricks.Arkanoid
                             if (temp.brickType.Equals(BrickTypeEnum.HP_2))
                             {
                                 temp.brickType = BrickTypeEnum.HP_1;
+                                GameEvent(GameEventEnum.BRICK_DECREASE_HP);
                             }
                             else
                             {
@@ -362,7 +396,7 @@ namespace power_bricks.Arkanoid
 
                 // drogę do pokonania dzielę na 10 części, żeby zminimalizować ryzyko tunelowania
                 // im większa wartość, tym większa dokładnośc
-                int divisions = 10;
+                int divisions = 2;
 
                 for (int d = 0; d < divisions; d++)
                 {
@@ -441,6 +475,7 @@ namespace power_bricks.Arkanoid
                                     if (temp.brickType.Equals(BrickTypeEnum.HP_2))
                                     {
                                         temp.brickType = BrickTypeEnum.HP_1;
+                                        GameEvent(GameEventEnum.BRICK_DECREASE_HP);
                                     }
                                     else
                                     {
@@ -556,6 +591,26 @@ namespace power_bricks.Arkanoid
             if (showScoreboard)
             {
                 // W TYM MIEJSCU RYSUJESZ SCOREBOARDA
+                spriteBatch.Draw(game_over_clear, new Rectangle(400, 300, 800, 600), Color.White);
+                spriteBatch.DrawString(scoreFont, "Your score:  " + player.points.ToString(), new Vector2(420, 320), Color.White);
+                spriteBatch.Draw(play_again, new Rectangle(570, 560, 468, 45), Color.White);
+                spriteBatch.Draw(back_to_menu, new Rectangle(570, 660, 468, 45), Color.White);
+
+                if (game.mouse_x > 570 && game.mouse_x < 570 + 468 && game.mouse_y > 560 && game.mouse_y < 560 + 45)
+                {
+                    option = 1;
+                    spriteBatch.Draw(play_again_selected, new Rectangle(570, 560, 468, 45), Color.White);
+                    spriteBatch.Draw(back_to_menu, new Rectangle(570, 660, 468, 45), Color.White);
+                }
+                else if (game.mouse_x > 570 && game.mouse_x < 570 + 468 && game.mouse_y > 660 && game.mouse_y < 660 + 45)
+                {
+                    option = 2;
+                    spriteBatch.Draw(play_again, new Rectangle(570, 560, 468, 45), Color.White);
+                    spriteBatch.Draw(back_to_menu_selected, new Rectangle(570, 660, 468, 45), Color.White);
+                }
+                else option = 0;
+                    
+
             }
         }
 
@@ -578,7 +633,23 @@ namespace power_bricks.Arkanoid
             bonus_slow = content.Load<Texture2D>("Texture/Game/slow_ball");
             bonus_double_ball = content.Load<Texture2D>("Texture/Game/split_ball");
 
+            game_over_clear = content.Load<Texture2D>("Texture/Game/game_over_clear");
+            play_again = content.Load<Texture2D>("Texture/Game/play");
+            play_again_selected = content.Load<Texture2D>("Texture/Game/play-selected");
+            back_to_menu = content.Load<Texture2D>("Texture/Game/back");
+            back_to_menu_selected = content.Load<Texture2D>("Texture/Game/back-selected");
+
             scoreFont = content.Load<SpriteFont>("Fonts/ScoreFont");
+        }
+
+        public void LoadAudio(ContentManager content)
+        {
+            gunfire = content.Load<SoundEffect>("Audio/Gunfire");
+            lost_life = content.Load<SoundEffect>("Audio/stracone_zycie");
+            unbreakable = content.Load<SoundEffect>("Audio/unbreakable");
+            common_brick = content.Load<SoundEffect>("Audio/zwykly_klocek");
+            pick_bonus = content.Load<SoundEffect>("Audio/bonus");
+            level_up = content.Load<Song>("Audio/level-up");
         }
 
         public override void OnEnter()
@@ -593,6 +664,7 @@ namespace power_bricks.Arkanoid
             changeLevel = false;
             ballDropped = false;
             showScoreboard = false;
+            //showScoreboard = true;
 
             player = new Player();
             
@@ -619,7 +691,7 @@ namespace power_bricks.Arkanoid
 
             if (showScoreboard)
             {
-               
+         
             }
         }
 
@@ -649,6 +721,13 @@ namespace power_bricks.Arkanoid
             {
                 GameEvent(GameEventEnum.SHOOT);
                 listOfLasers.Add(new Laser(new Rectangle(paddle.position.Center.X, paddle.position.Y - 20, 4, 15)));
+            }
+
+            if (showScoreboard)
+            {
+                if (option != 0) showScoreboard = false;   
+                if (option == 1) game.ShowGameMode();
+                if (option == 2) game.ShowMainMenu();
             }
         }
         

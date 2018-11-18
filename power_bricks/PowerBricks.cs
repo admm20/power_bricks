@@ -190,6 +190,7 @@ namespace power_bricks
             black_tile = Content.Load<Texture2D>("Texture/Menu/black_tile");
             menu.LoadTextures(Content);
             gameMode.LoadTextures(Content);
+            gameMode.LoadAudio(Content);
         }
         
         protected override void UnloadContent()

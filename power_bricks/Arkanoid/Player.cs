@@ -8,7 +8,7 @@ namespace power_bricks.Arkanoid
 {
     class Player
     {
-        public int lifes = 3;
+        public int lifes = 1;//3;
         public int points = 0;
 
         public bool canShoot = false;
